@@ -42,6 +42,24 @@ npx xsheel mwt
 npx -p xsheel mwt
 ```
 
+## 发布到 npm
+
+首次在本机发布需要登录：
+
+```sh
+npm login
+```
+
+发布（公开包）：
+
+```sh
+npm publish --access public
+```
+
+说明：
+
+- 每次发布前会自动运行 `tools/sync-bins.mjs`，把当前目录（以及可选的 `scripts/` 目录）里所有“可执行文件”同步到 `package.json` 的 `bin` 字段；后续新增脚本只要 `chmod +x` 并重新发布即可通过 npx 使用。
+
 删除指定分支对应的 worktree 并删除该分支：
 
 ```sh
