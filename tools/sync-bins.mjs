@@ -40,7 +40,7 @@ function findScripts() {
 const pkg = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
 const scripts = findScripts();
 
-const nextBin = { xsheel: "bin/xsheel.js", xsh: "bin/xsheel.js" };
+const nextBin = { xsh: "bin/xsh.js" };
 for (const [name, relPath] of [...scripts.entries()].sort(([a], [b]) => a.localeCompare(b))) {
   nextBin[name] = relPath;
 }

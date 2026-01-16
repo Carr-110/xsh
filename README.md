@@ -39,7 +39,7 @@ npx xsh mwt
 也可以直接执行脚本同名的 bin（需要 npm 的 `exec`/`npx` 支持；更通用的写法是 `-p`）：
 
 ```sh
-npx -p xsheel mwt
+npx -p xsh mwt
 ```
 
 ## 发布到 npm

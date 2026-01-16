@@ -1,16 +1,15 @@
 {
-  "name": "xsheel",
+  "name": "xsh",
   "version": "0.1.0",
   "description": "A tiny collection of shell helpers runnable via npx.",
   "license": "MIT",
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Carr-110/xsheel.git"
+    "url": "https://github.com/Carr-110/xsh.git"
   },
   "bin": {
-    "xsheel": "bin/xsheel.js",
-    "xsh": "bin/xsheel.js",
+    "xsh": "bin/xsh.js",
     "mwt": "mwt"
   },
   "files": [

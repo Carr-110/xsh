@@ -49,15 +49,15 @@ function printHelp() {
   process.stderr.write(
     [
       "Usage:",
-      "  xsheel <script> [args...]",
-      "  xsheel --list",
+      "  xsh <script> [args...]",
+      "  xsh --list",
       "",
       "Scripts:",
       names.length ? `  ${names.join("\n  ")}` : "  (none found)",
       "",
       "Examples:",
-      "  npx xsheel mwt",
-      "  npx -p xsheel mwt",
+      "  npx xsh mwt",
+      "  npx -p xsh mwt",
     ].join("\n") + "\n",
   );
 }
@@ -69,7 +69,7 @@ function run(scriptPath, args) {
     process.exit(code ?? 1);
   });
   child.on("error", (err) => {
-    process.stderr.write(`xsheel: failed to run: ${err?.message ?? String(err)}\n`);
+    process.stderr.write(`xsh: failed to run: ${err?.message ?? String(err)}\n`);
     process.exit(1);
   });
 }
@@ -89,17 +89,16 @@ if (sub === "--list") {
 }
 
 if (sub.includes("/") || sub.includes("\\")) {
-  process.stderr.write("xsheel: script name must not contain path separators\n");
+  process.stderr.write("xsh: script name must not contain path separators\n");
   process.exit(1);
 }
 
 const scripts = new Map(listScripts());
 const scriptPath = scripts.get(sub);
 if (!scriptPath) {
-  process.stderr.write(`xsheel: unknown script: ${sub}\n`);
+  process.stderr.write(`xsh: unknown script: ${sub}\n`);
   printHelp();
   process.exit(1);
 }
 
 run(scriptPath, argv.slice(1));
-
