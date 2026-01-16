@@ -6,7 +6,7 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/REPLACE_ME/xsheel.git"
+    "url": "https://github.com/Carr-110/xsheel.git"
   },
   "bin": {
     "xsheel": "bin/xsheel.js",
