@@ -10,6 +10,7 @@
   },
   "bin": {
     "xsheel": "bin/xsheel.js",
+    "xsh": "bin/xsheel.js",
     "mwt": "mwt"
   },
   "files": [

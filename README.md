@@ -33,7 +33,7 @@ chmod +x mwt
 发布到 npm 后，可以直接运行仓库里的脚本：
 
 ```sh
-npx xsheel mwt
+npx xsh mwt
 ```
 
 也可以直接执行脚本同名的 bin（需要 npm 的 `exec`/`npx` 支持；更通用的写法是 `-p`）：
