@@ -117,11 +117,15 @@ while [[ $# -gt 0 ]]; do
 done
 
 git rev-parse --is-inside-work-tree >/dev/null 2>&1 || die "not inside a git worktree"
-
 repo_root="$(git rev-parse --show-toplevel)"
 project_name="$(basename "$repo_root")"
 copy_config_file="${repo_root}/.mwt-copy"
-copy_default_file="${repo_root}/.mwt-copy.default"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+copy_default_file="${script_dir}/.mwt-copy.default"
+
+git_in_repo() {
+  git -C "$repo_root" "$@"
+}
 
 trim() {
   local s="$1"
@@ -152,7 +156,7 @@ copy_extras() {
   local src_root="$1"
   local dest_root="$2"
   local rel src dest
-  for rel in "${copy_paths[@]}"; do
+  for rel in "${copy_paths[@]-}"; do
     if [[ "$rel" == /* || "$rel" == *".."* ]]; then
       echo "mwt: skipping invalid path in .mwt-copy: $rel" >&2
       continue
@@ -171,7 +175,7 @@ copy_extras() {
 }
 
 if [[ "$subcmd" == "delete" ]]; then
-  if ! git show-ref --verify --quiet "refs/heads/${target_branch}"; then
+  if ! git_in_repo show-ref --verify --quiet "refs/heads/${target_branch}"; then
     die "branch not found: ${target_branch}"
   fi
 
@@ -188,20 +192,20 @@ if [[ "$subcmd" == "delete" ]]; then
         fi
         ;;
     esac
-  done < <(git worktree list --porcelain)
+  done < <(git_in_repo worktree list --porcelain)
 
   if [[ -n "${worktree_path:-}" ]]; then
     if [[ $force -eq 1 ]]; then
-      git worktree remove --force "$worktree_path"
+      git_in_repo worktree remove --force "$worktree_path"
     else
-      git worktree remove "$worktree_path"
+      git_in_repo worktree remove "$worktree_path"
     fi
   fi
 
   if [[ $force -eq 1 ]]; then
-    git branch -D "$target_branch" >/dev/null
+    git_in_repo branch -D "$target_branch" >/dev/null
   else
-    git branch -d "$target_branch" >/dev/null
+    git_in_repo branch -d "$target_branch" >/dev/null
   fi
 
   exit 0
@@ -228,7 +232,7 @@ if [[ "$subcmd" == "delete-all" ]]; then
         fi
         ;;
     esac
-  done < <(git worktree list --porcelain)
+  done < <(git_in_repo worktree list --porcelain)
 
   if [[ ${#worktree_paths[@]} -eq 0 ]]; then
     die "no matching worktrees found under: ${worktree_parent}"
@@ -236,19 +240,19 @@ if [[ "$subcmd" == "delete-all" ]]; then
 
   for p in "${worktree_paths[@]}"; do
     if [[ $force -eq 1 ]]; then
-      git worktree remove --force "$p"
+      git_in_repo worktree remove --force "$p"
     else
-      git worktree remove "$p"
+      git_in_repo worktree remove "$p"
     fi
   done
 
   for b in "${branch_names[@]}"; do
     [[ "$b" == "${branch_prefix}"* ]] || continue
-    if git show-ref --verify --quiet "refs/heads/${b}"; then
+    if git_in_repo show-ref --verify --quiet "refs/heads/${b}"; then
       if [[ $force -eq 1 ]]; then
-        git branch -D "$b" >/dev/null
+        git_in_repo branch -D "$b" >/dev/null
       else
-        git branch -d "$b" >/dev/null
+        git_in_repo branch -d "$b" >/dev/null
       fi
     fi
   done
@@ -269,12 +273,12 @@ while :; do
   branch_name="${branch_prefix}${id}"
   worktree_path="${worktree_parent}/${id}"
 
-  git show-ref --verify --quiet "refs/heads/${branch_name}" && continue
+  git_in_repo show-ref --verify --quiet "refs/heads/${branch_name}" && continue
   [[ -e "$worktree_path" ]] && continue
   break
 done
 
-git worktree add -b "$branch_name" "$worktree_path" "$base_ref" >/dev/null
+git_in_repo worktree add -b "$branch_name" "$worktree_path" "$base_ref" >/dev/null
 copy_extras "$repo_root" "$worktree_path"
 
 if [[ $print_path -eq 1 ]]; then
