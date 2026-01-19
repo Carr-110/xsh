@@ -101,3 +101,20 @@ npm publish --access public
 ```sh
 ./mwt --base main
 ```
+
+## 额外拷贝文件/目录
+
+默认配置在仓库根目录的 `.mwt-copy.default`，创建 worktree 时会按其中规则拷贝（如果存在且目标不存在）：
+
+```
+CLAUDE.md
+.claude
+```
+
+如果你创建了 `.mwt-copy`，会完全覆盖默认规则。每行一个相对路径，支持注释 `#`：
+
+```
+# 例如
+.env.local
+docs/private-notes
+```

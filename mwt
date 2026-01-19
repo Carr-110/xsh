@@ -54,6 +54,8 @@ root_dir="${HOME}/Library/Application Support/mwt/worktrees"
 branch_prefix="wt-"
 start_shell=1
 print_path=0
+copy_config_file=""
+copy_default_file=""
 
 subcmd=""
 target_branch=""
@@ -118,6 +120,55 @@ git rev-parse --is-inside-work-tree >/dev/null 2>&1 || die "not inside a git wor
 
 repo_root="$(git rev-parse --show-toplevel)"
 project_name="$(basename "$repo_root")"
+copy_config_file="${repo_root}/.mwt-copy"
+copy_default_file="${repo_root}/.mwt-copy.default"
+
+trim() {
+  local s="$1"
+  s="${s#"${s%%[![:space:]]*}"}"
+  s="${s%"${s##*[![:space:]]}"}"
+  printf '%s' "$s"
+}
+
+declare -a copy_paths=()
+
+if [[ -f "$copy_config_file" ]]; then
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    line="${line%%#*}"
+    line="$(trim "$line")"
+    [[ -z "$line" ]] && continue
+    copy_paths+=("$line")
+  done < "$copy_config_file"
+elif [[ -f "$copy_default_file" ]]; then
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    line="${line%%#*}"
+    line="$(trim "$line")"
+    [[ -z "$line" ]] && continue
+    copy_paths+=("$line")
+  done < "$copy_default_file"
+fi
+
+copy_extras() {
+  local src_root="$1"
+  local dest_root="$2"
+  local rel src dest
+  for rel in "${copy_paths[@]}"; do
+    if [[ "$rel" == /* || "$rel" == *".."* ]]; then
+      echo "mwt: skipping invalid path in .mwt-copy: $rel" >&2
+      continue
+    fi
+    src="${src_root%/}/$rel"
+    dest="${dest_root%/}/$rel"
+    [[ -e "$src" ]] || continue
+    [[ -e "$dest" ]] && continue
+    mkdir -p "$(dirname "$dest")"
+    if [[ -d "$src" ]]; then
+      cp -R "$src" "$dest"
+    else
+      cp "$src" "$dest"
+    fi
+  done
+}
 
 if [[ "$subcmd" == "delete" ]]; then
   if ! git show-ref --verify --quiet "refs/heads/${target_branch}"; then
@@ -224,6 +275,7 @@ while :; do
 done
 
 git worktree add -b "$branch_name" "$worktree_path" "$base_ref" >/dev/null
+copy_extras "$repo_root" "$worktree_path"
 
 if [[ $print_path -eq 1 ]]; then
   echo "$worktree_path"

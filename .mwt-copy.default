@@ -1,0 +1,5 @@
+# Default extra files or directories to copy into new worktrees.
+# One path per line, relative to the repo root.
+# Empty lines and lines starting with # are ignored.
+CLAUDE.md
+.claude
