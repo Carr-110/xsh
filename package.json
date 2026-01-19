@@ -16,7 +16,8 @@
     "bin/",
     "tools/",
     "README.md",
-    "mwt"
+    "mwt",
+    ".mwt-copy.default"
   ],
   "scripts": {
     "sync-bins": "node tools/sync-bins.mjs",
